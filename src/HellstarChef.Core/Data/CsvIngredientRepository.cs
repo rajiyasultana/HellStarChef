@@ -26,7 +26,7 @@ namespace HellstarChef.Core.Data
                 if (string.IsNullOrEmpty(line)) continue;
 
                 // naive CSV split (no quoted commas expected in fields)
-                string[] parts = line.Split(',');
+                string[] parts = CsvParsing.SplitCsvLine(line);
                 string name = parts.Length > 0 ? parts[0].Trim() : throw new InvalidDataException("Missing name");
                 string flavorPart = parts.Length > 1 ? parts[1].Trim() : string.Empty;
                 string rarityPart = parts.Length > 2 ? parts[2].Trim() : "1";
@@ -34,36 +34,13 @@ namespace HellstarChef.Core.Data
                 string isToxicPart = parts.Length > 4 ? parts[4].Trim() : "false";
                 string tagsPart = parts.Length > 5 ? parts[5].Trim() : string.Empty;
 
-                Dictionary<Flavor, double> flavorDict = new Dictionary<Flavor, double>();
-                if (!string.IsNullOrEmpty(flavorPart))
-                {
-                    string[] pairs = flavorPart.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string pair in pairs)
-                    {
-                        string[] kv = pair.Split('=', StringSplitOptions.RemoveEmptyEntries);
-                        if (kv.Length != 2) continue;
-                        string key = kv[0].Trim();
-                        string val = kv[1].Trim();
-                        if (Enum.TryParse<Flavor>(key, true, out Flavor f) && double.TryParse(val, out double d))
-                        {
-                            flavorDict[f] = d;
-                        }
-                    }
-                }
+                Dictionary<Flavor, double> flavorDict = CsvParsing.ParseFlavorDict(flavorPart);
 
                 int rarity = int.TryParse(rarityPart, out int r) ? r : 1;
                 double rawness = double.TryParse(rawnessPart, out double rr) ? rr : 1.0;
                 bool isToxic = bool.TryParse(isToxicPart, out bool it) && it;
 
-                List<SpecialTag> tags = new List<SpecialTag>();
-                if (!string.IsNullOrEmpty(tagsPart))
-                {
-                    string[] partsTags = tagsPart.Split('|', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string t in partsTags)
-                    {
-                        if (Enum.TryParse<SpecialTag>(t.Trim(), true, out SpecialTag st)) tags.Add(st);
-                    }
-                }
+                List<SpecialTag> tags = CsvParsing.ParseSpecialTags(tagsPart);
 
                 outList.Add(new Ingredient(name, flavorDict, rarity, rawness, isToxic, tags));
             }

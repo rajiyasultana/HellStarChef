@@ -24,56 +24,19 @@ namespace HellstarChef.Core.Data
                 string line = lines[i].Trim();
                 if (string.IsNullOrEmpty(line)) continue;
 
-                string[] parts = line.Split(',');
+                string[] parts = CsvParsing.SplitCsvLine(line);
                 string name = parts.Length > 0 ? parts[0].Trim() : throw new InvalidDataException("Missing dish name");
                 string rulesPart = parts.Length > 1 ? parts[1].Trim() : string.Empty;
                 string tagsPart = parts.Length > 2 ? parts[2].Trim() : string.Empty;
 
-                List<DishRule> rules = new List<DishRule>();
-
-                if (!string.IsNullOrEmpty(rulesPart))
-                {
-                    string[] rulePairs = rulesPart.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string pair in rulePairs)
-                    {
-                        string[] kv = pair.Split('=', StringSplitOptions.RemoveEmptyEntries);
-                        if (kv.Length != 2) continue;
-                        string key = kv[0].Trim();
-                        string valStr = kv[1].Trim();
-                        if (!double.TryParse(valStr, out double val)) continue;
-
-                        if (key.EndsWith("_min", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string fname = key.Substring(0, key.Length - 4);
-                            if (Enum.TryParse<Flavor>(fname, true, out Flavor f))
-                            {
-                                rules.Add(new FlavorThresholdRule(f, min: val));
-                            }
-                        }
-                        else if (key.EndsWith("_max", StringComparison.OrdinalIgnoreCase))
-                        {
-                            string fname = key.Substring(0, key.Length - 4);
-                            if (Enum.TryParse<Flavor>(fname, true, out Flavor f))
-                            {
-                                rules.Add(new FlavorThresholdRule(f, max: val));
-                            }
-                        }
-                        else
-                        {
-                            // unknown rule shape - ignore
-                        }
-                    }
-                }
+                List<DishRule> rules = CsvParsing.ParseDishRules(rulesPart);
 
                 if (!string.IsNullOrEmpty(tagsPart))
                 {
-                    string[] tagParts = tagsPart.Split('|', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string t in tagParts)
+                    var tagList = CsvParsing.ParseSpecialTags(tagsPart);
+                    foreach (var st in tagList)
                     {
-                        if (Enum.TryParse<SpecialTag>(t.Trim(), true, out SpecialTag st))
-                        {
-                            rules.Add(new SpecialTagRule(st, required: true));
-                        }
+                        rules.Add(new SpecialTagRule(st, required: true));
                     }
                 }
 
