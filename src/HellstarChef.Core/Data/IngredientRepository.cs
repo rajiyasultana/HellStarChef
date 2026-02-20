@@ -33,6 +33,24 @@ namespace HellstarChef.Core.Data
             new Dictionary<Flavor, double>(),
             rarity: 1);
 
-        public static IEnumerable<Ingredient> DefaultSet() => new[] { Fish, FirePaper, Chili, Herb, Ice };
+        public static IEnumerable<Ingredient> DefaultSet()
+        {
+            const string csvPath = "data/ingredients.csv";
+
+            if (System.IO.File.Exists(csvPath))
+            {
+                try
+                {
+                    CsvIngredientRepository csvLoader = new CsvIngredientRepository();
+                    return csvLoader.Load(csvPath);
+                }
+                catch
+                {
+                    // fall back to built-in set
+                }
+            }
+
+            return new[] { Fish, FirePaper, Chili, Herb, Ice };
+        }
     }
 }

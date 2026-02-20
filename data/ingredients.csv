@@ -1,0 +1,6 @@
+Name,FlavorProfile,Rarity,Rawness,IsToxic,SpecialTags
+Fish,"Savory=1.0;Umami=1.0",1,1.0,false,
+FirePaper,"Spicy=1.0;Bitter=0.5",1,1.0,false,
+Chili,"Spicy=1.0",1,1.0,false,
+Herb,"Sweet=0.5",1,1.0,false,Memory
+Ice,"",1,1.0,false,
