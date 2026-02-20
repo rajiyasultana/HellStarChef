@@ -17,6 +17,11 @@ namespace HellstarChef.Core.Data
             new Dictionary<Flavor, double> { { Flavor.Spicy, 1.0 }, { Flavor.Bitter, 0.5 } },
             rarity: 1);
 
+        public static Ingredient Chili => new Ingredient(
+            "Chili",
+            new Dictionary<Flavor, double> { { Flavor.Spicy, 1.0 } },
+            rarity: 1);
+
         public static Ingredient Herb => new Ingredient(
             "Herb",
             new Dictionary<Flavor, double> { { Flavor.Sweet, 0.5 } },
@@ -28,6 +33,6 @@ namespace HellstarChef.Core.Data
             new Dictionary<Flavor, double>(),
             rarity: 1);
 
-        public static IEnumerable<Ingredient> DefaultSet() => new[] { Fish, FirePaper, Herb, Ice };
+        public static IEnumerable<Ingredient> DefaultSet() => new[] { Fish, FirePaper, Chili, Herb, Ice };
     }
 }

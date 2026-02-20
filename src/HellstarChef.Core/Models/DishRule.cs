@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace HellstarChef.Core.Models
 {
-    public record FlavorTotals(Dictionary<Flavor, double> Totals)
+    public record FlavorTotals(System.Collections.Generic.IReadOnlyDictionary<Flavor, double> Totals)
     {
         public double Get(Flavor f) => Totals.TryGetValue(f, out var v) ? v : 0.0;
     }

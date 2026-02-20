@@ -17,16 +17,17 @@ namespace HellstarChef.Core.Services
             Tags = tags;
         }
     }
-
-    public static class DishEvaluator
+    public class DishEvaluator : IDishEvaluator
     {
-        public static DishEvaluationResult Evaluate(Dish dish, IEnumerable<Ingredient> ingredients)
+        public DishEvaluationResult Evaluate(Dish dish, IEnumerable<Ingredient> ingredients)
         {
             var totals = new Dictionary<Flavor, double>();
             var tags = new HashSet<SpecialTag>();
 
             foreach (var ing in ingredients)
             {
+                if (ing == null) continue;
+
                 foreach (var kv in ing.FlavorProfile)
                 {
                     if (!totals.ContainsKey(kv.Key)) totals[kv.Key] = 0.0;

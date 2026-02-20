@@ -12,8 +12,8 @@ namespace HellstarChef.Core.Tests
         public void FlavorAggregation_Works()
         {
             var set = IngredientRepository.DefaultSet();
-            var totals = DishEvaluator.Evaluate(new Dish("Test"), set).Totals;
-
+            var evaluator = new HellstarChef.Core.Services.DishEvaluator();
+            var totals = evaluator.Evaluate(new Dish("Test"), set).Totals;
             Assert.Equal(1.0, totals.Get(Flavor.Savory));
             Assert.Equal(1.0, totals.Get(Flavor.Umami));
             Assert.Equal(1.0, totals.Get(Flavor.Spicy));
@@ -33,7 +33,8 @@ namespace HellstarChef.Core.Tests
 
             // To reach Spicy 1.5, combine FirePaper (1.0) + another FirePaper
             var ingredients = new[] { IngredientRepository.FirePaper, IngredientRepository.FirePaper, IngredientRepository.Fish };
-            var result = DishEvaluator.Evaluate(ruleDish, ingredients);
+            var evaluator = new HellstarChef.Core.Services.DishEvaluator();
+            var result = evaluator.Evaluate(ruleDish, ingredients);
 
             Assert.True(result.IsMatch);
         }
@@ -51,12 +52,13 @@ namespace HellstarChef.Core.Tests
 
             var ingredients = new Ingredient[] {
                 IngredientRepository.FirePaper,
-                IngredientRepository.FirePaper,
+                IngredientRepository.Chili,
                 IngredientRepository.Fish,
                 IngredientRepository.Herb
             };
 
-            var result = DishEvaluator.Evaluate(dish, ingredients);
+            var evaluator = new HellstarChef.Core.Services.DishEvaluator();
+            var result = evaluator.Evaluate(dish, ingredients);
             Assert.True(result.IsMatch);
         }
     }
