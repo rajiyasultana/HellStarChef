@@ -24,6 +24,10 @@ namespace HellsterChef.Core.Data
 
                 string name = parts[0].Trim();
                 string flavors = parts[1].Trim();
+                if (flavors.StartsWith("\"") && flavors.EndsWith("\""))
+                {
+                    flavors = flavors[1..^1];
+                }
                 if (!int.TryParse(parts[2], out int rarity)) rarity = 0;
                 if (!double.TryParse(parts[3], out double rawness)) rawness = 0.0;
                 bool isToxic = bool.TryParse(parts[4], out bool tox) && tox;
