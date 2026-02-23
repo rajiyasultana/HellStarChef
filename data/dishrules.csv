@@ -1,2 +1,4 @@
 Name,Conditions
 Inferno Memory Stew,"Spicy>=2.0;Umami>=1.0;Memory=true;Bitter<=0.7"
+Sweet Healing Soup,"Sweet>=1.5;Healing=true;Umami>=0.5"
+Spicy Power Salad,"Spicy>=1.5;Power=true;Bitter<=0.5"

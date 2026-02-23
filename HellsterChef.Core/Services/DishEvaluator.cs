@@ -55,5 +55,20 @@ namespace HellsterChef.Core.Services
             result.Matches = allOk && result.Reasons.Count == 0;
             return result;
         }
+
+        // Discover which dishes match the mixed ingredients
+        public List<string> DiscoverDishes(Dish dish, IEnumerable<DishRule> allRules)
+        {
+            List<string> discovered = new List<string>();
+            foreach (DishRule rule in allRules)
+            {
+                DishEvaluationResult res = Evaluate(dish, rule);
+                if (res.Matches)
+                {
+                    discovered.Add(rule.Name);
+                }
+            }
+            return discovered;
+        }
     }
 }

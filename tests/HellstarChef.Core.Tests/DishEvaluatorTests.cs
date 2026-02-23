@@ -23,21 +23,20 @@ namespace HellstarChef.Core.Tests
             // Load rules from CSV
             string rulesPath = @"d:\Rajiya\HellStarChef\data\dishrules.csv";
             List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(rulesPath).ToList();
-            DishRule? rule = rules.FirstOrDefault(r => r.Name == "Inferno Memory Stew");
-            Assert.IsNotNull(rule, "Dish rule should be loaded");
+            Assert.IsNotEmpty(rules, "Dish rules CSV should load data");
 
-            // Player selects ingredients
+            // Player selects ingredients (without knowing the dish)
             PlayerChef chef = new PlayerChef();
             List<string> selection = new List<string> { "FirePaper", "FirePaper", "Fish", "Herb" };
-            Dish dish = chef.MixByName("Inferno Memory Stew", selection, pool);
+            Dish dish = chef.MixByName(selection, pool);
 
             DishEvaluator eval = new DishEvaluator();
 
-            // Act
-            DishEvaluationResult res = eval.Evaluate(dish, rule);
+            // Discover which dishes match
+            List<string> discovered = eval.DiscoverDishes(dish, rules);
 
-            // Assert
-            Assert.IsTrue(res.Matches, string.Join("; ", res.Reasons));
+            // Assert that "Inferno Memory Stew" is discovered
+            Assert.Contains("Inferno Memory Stew", discovered, "Inferno Memory Stew should be discovered");
         }
     }
 }

@@ -7,9 +7,9 @@ namespace HellsterChef.Core.Services
     public sealed class PlayerChef
     {
         // Mix ingredients by name from an available pool; returns a new Dish
-        public Dish MixByName(string dishName, IEnumerable<string> ingredientNames, IEnumerable<Ingredient> pool)
+        public Dish MixByName(IEnumerable<string> ingredientNames, IEnumerable<Ingredient> pool)
         {
-            Dish dish = new Dish(dishName);
+            Dish dish = new Dish("Mixed Dish"); // Generic name; discovery happens later
 
             List<Ingredient> poolList = pool.ToList();
             foreach (string name in ingredientNames)
