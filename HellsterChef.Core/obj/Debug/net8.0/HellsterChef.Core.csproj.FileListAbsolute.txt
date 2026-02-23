@@ -1,0 +1,12 @@
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.AssemblyInfoInputs.cache
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.AssemblyInfo.cs
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.csproj.CoreCompileInputs.cache
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.sourcelink.json
+D:\Rajiya\HellStarChef\HellsterChef.Core\bin\Debug\net8.0\HellsterChef.Core.deps.json
+D:\Rajiya\HellStarChef\HellsterChef.Core\bin\Debug\net8.0\HellsterChef.Core.dll
+D:\Rajiya\HellStarChef\HellsterChef.Core\bin\Debug\net8.0\HellsterChef.Core.pdb
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.dll
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\refint\HellsterChef.Core.dll
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\HellsterChef.Core.pdb
+D:\Rajiya\HellStarChef\HellsterChef.Core\obj\Debug\net8.0\ref\HellsterChef.Core.dll
