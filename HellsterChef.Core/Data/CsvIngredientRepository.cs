@@ -2,19 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HellsterChef.Core.Models;
 
 namespace HellsterChef.Core.Data
 {
-    public static class CsvIngredientRepository
+    public class CsvIngredientRepository : IIngredientRepository
     {
+        private readonly string _filePath;
+
+        public CsvIngredientRepository(string filePath)
+        {
+            _filePath = filePath;
+        }
+
         // Expected CSV columns: Name,Flavors,Rarity,Rawness,IsToxic,SpecialTags,Type
         // Flavors format: "Savory:1;Umami:1;Spicy:0.5"
 
-        public static IEnumerable<Ingredient> ReadFromFile(string path)
+        public async Task<IEnumerable<Ingredient>> GetAllAsync()
         {
-            if (!File.Exists(path)) yield break;
-            foreach (string line in File.ReadLines(path))
+            if (!File.Exists(_filePath)) return Enumerable.Empty<Ingredient>();
+            
+            var lines = await File.ReadAllLinesAsync(_filePath);
+            var ingredients = new List<Ingredient>();
+            
+            foreach (string line in lines)
             {
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 if (line.TrimStart().StartsWith("#")) continue;
@@ -33,7 +45,7 @@ namespace HellsterChef.Core.Data
                 bool isToxic = bool.TryParse(parts[4], out bool tox) && tox;
                 string[] tags = parts[5].Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                 string typeStr = parts[6].Trim();
-                IngredientType type = Enum.TryParse<IngredientType>(typeStr, true, out IngredientType it) ? it : IngredientType.Side;
+                IngredientType type = Enum.TryParse<IngredientType>(typeStr, true, out IngredientType it) ? it : IngredientType.Vegetable;
 
                 Ingredient ingredient = new Ingredient(name)
                 {
@@ -62,8 +74,10 @@ namespace HellsterChef.Core.Data
                     if (Enum.TryParse<SpecialTag>(t, true, out SpecialTag st)) ingredient.SpecialTags.Add(st);
                 }
 
-                yield return ingredient;
+                ingredients.Add(ingredient);
             }
+            
+            return ingredients;
         }
     }
 }

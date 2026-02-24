@@ -4,7 +4,7 @@ using HellsterChef.Core.Models;
 
 namespace HellsterChef.Core.Services
 {
-    public sealed class PlayerChef
+    public sealed class PlayerChef : IPlayerChef
     {
         // Mix ingredients by name from an available pool; returns a new Dish
         public Dish MixByName(IEnumerable<string> ingredientNames, IEnumerable<Ingredient> pool)

@@ -1,0 +1,7 @@
+Ingredient1,Ingredient2,Effect,Description
+FirePaper,Mushroom,Poison,Combustible and fungal toxins react badly
+Honey,FirePaper,Poison,Caramelized paper releases toxins when heated
+Chili,Ice,Penalty,Texture clash reduces palatability
+Herb,Honey,Bonus,Enhances sweetness
+Mushroom,Tomato,Bonus,Classic combination
+Garlic,Ice,Poison,Raw cooling + raw garlic makes a bitter toxic taste

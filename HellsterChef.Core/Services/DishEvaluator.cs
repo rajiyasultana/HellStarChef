@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using HellsterChef.Core.Models;
 using HellsterChef.Core.Rules;
@@ -10,6 +12,7 @@ namespace HellsterChef.Core.Services
         public bool Matches { get; set; }
         public List<string> Reasons { get; set; } = new List<string>();
         public DishQuality Quality { get; set; }
+        public bool IsPoisoned { get; set; }
     }
 
     public sealed class DishEvaluator
@@ -18,11 +21,11 @@ namespace HellsterChef.Core.Services
         {
             DishEvaluationResult result = new DishEvaluationResult();
 
-            // Check for at least one base ingredient
-            bool hasBase = dish.Ingredients.Any(i => i.Type == IngredientType.Base);
+            // Check for at least one main ingredient (Protein, Vegetable, or Grain)
+            bool hasBase = dish.Ingredients.Any(i => i.Type == IngredientType.Protein || i.Type == IngredientType.Vegetable || i.Type == IngredientType.Grain);
             if (!hasBase)
             {
-                result.Reasons.Add("No base ingredient found; cannot form a proper dish.");
+                result.Reasons.Add("No main ingredient (protein, vegetable, or grain) found; cannot form a proper dish.");
                 result.Matches = false;
                 result.Quality = DishQuality.Dumb;
                 return result;
@@ -37,6 +40,17 @@ namespace HellsterChef.Core.Services
                     if (!flavorTotals.ContainsKey(kv.Key)) flavorTotals[kv.Key] = 0.0;
                     flavorTotals[kv.Key] += kv.Value;
                 }
+            }
+            
+            // Check for poisonous or strongly incompatible ingredient synergies
+            var poisonReasons = CheckPoisonousSynergies(dish.Ingredients);
+            if (poisonReasons.Any())
+            {
+                result.IsPoisoned = true;
+                result.Matches = false;
+                result.Quality = DishQuality.Dumb;
+                result.Reasons.AddRange(poisonReasons);
+                return result;
             }
 
             bool allOk = true;
@@ -76,13 +90,13 @@ namespace HellsterChef.Core.Services
                         exactCount++; // Tags are exact
                     }
                 }
-                else if (cond.RequiredBaseName is not null)
+                else if (cond.RequiredBaseNames is not null && cond.RequiredBaseNames.Count > 0)
                 {
-                    bool has = dish.Ingredients.Any(i => i.Name == cond.RequiredBaseName && i.Type == IngredientType.Base);
+                    bool has = cond.RequiredBaseNames.Any(name => dish.Ingredients.Any(i => i.Name == name));
                     if (!has)
                     {
                         allOk = false;
-                        result.Reasons.Add($"Required base ingredient {cond.RequiredBaseName} not found");
+                        result.Reasons.Add($"Required base ingredient not found; options: {string.Join(", ", cond.RequiredBaseNames)}");
                     }
                     else
                     {
@@ -95,7 +109,7 @@ namespace HellsterChef.Core.Services
 
             // Determine quality
             bool hasToxic = dish.Ingredients.Any(i => i.IsToxic);
-            int baseCount = dish.Ingredients.Count(i => i.Type == IngredientType.Base);
+            int baseCount = dish.Ingredients.Count(i => i.Type == IngredientType.Protein || i.Type == IngredientType.Vegetable || i.Type == IngredientType.Grain);
             if (!result.Matches)
             {
                 if (closeCount > 0 && !hasToxic && baseCount == 1)
@@ -112,6 +126,43 @@ namespace HellsterChef.Core.Services
             }
 
             return result;
+        }
+
+        private List<string> CheckPoisonousSynergies(IEnumerable<Ingredient> ingredients)
+        {
+            var issues = new List<string>();
+            string path = Path.Combine("d:\\Rajiya\\HellStarChef", "data", "synergies.csv");
+            if (!File.Exists(path)) return issues;
+
+            var lines = File.ReadAllLines(path);
+            var ingNames = new HashSet<string>(ingredients.Select(i => i.Name));
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (line.TrimStart().StartsWith("#")) continue;
+                // Expect: Ingredient1,Ingredient2,Effect,Description
+                string[] parts = line.Split(',', StringSplitOptions.None);
+                if (parts.Length < 4) continue;
+                string a = parts[0].Trim();
+                string b = parts[1].Trim();
+                string effect = parts[2].Trim();
+                string desc = parts[3].Trim();
+
+                if (ingNames.Contains(a) && ingNames.Contains(b))
+                {
+                    if (effect.Equals("Poison", StringComparison.OrdinalIgnoreCase))
+                    {
+                        issues.Add($"Poisonous combination detected: {desc} ({a} + {b})");
+                    }
+                    else if (effect.Equals("Penalty", StringComparison.OrdinalIgnoreCase))
+                    {
+                        issues.Add($"Unfavorable pairing: {desc} ({a} + {b})");
+                    }
+                }
+            }
+
+            return issues;
         }
 
         // Discover which dishes match the mixed ingredients

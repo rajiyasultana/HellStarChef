@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Threading.Tasks;
 using HellsterChef.Core.Models;
 using HellsterChef.Core.Rules;
 using HellsterChef.Core.Services;
@@ -13,16 +14,18 @@ namespace HellstarChef.Core.Tests
     public class DishEvaluatorTests
     {
         [Test]
-        public void InfernoMemoryStew_IsDiscovered_WhenIngredientsSelected()
+        public async Task InfernoMemoryStew_IsDiscovered_WhenIngredientsSelected()
         {
             // Load ingredients from CSV
             string ingredientsPath = @"d:\Rajiya\HellStarChef\data\ingredients.csv";
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(ingredientsPath).ToList();
+            var ingredientRepo = new CsvIngredientRepository(ingredientsPath);
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
             Assert.IsNotEmpty(pool, "Ingredients CSV should load data");
 
             // Load rules from CSV
             string rulesPath = @"d:\Rajiya\HellStarChef\data\dishrules.csv";
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(rulesPath).ToList();
+            var ruleRepo = new CsvDishRuleRepository(rulesPath);
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
             Assert.IsNotEmpty(rules, "Dish rules CSV should load data");
 
             // Player selects ingredients (without knowing the dish)
@@ -40,10 +43,12 @@ namespace HellstarChef.Core.Tests
         }
 
         [Test]
-        public void SweetHealingSoup_IsDiscovered_WithHoneyAndMushroom()
+        public async Task SweetHealingSoup_IsDiscovered_WithHoneyAndMushroom()
         {
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\ingredients.csv").ToList();
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\dishrules.csv").ToList();
+            var ingredientRepo = new CsvIngredientRepository(@"d:\Rajiya\HellStarChef\data\ingredients.csv");
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
+            var ruleRepo = new CsvDishRuleRepository(@"d:\Rajiya\HellStarChef\data\dishrules.csv");
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
 
             PlayerChef chef = new PlayerChef();
             List<string> selection = new List<string> { "Honey", "Mushroom", "Fish" };
@@ -56,10 +61,12 @@ namespace HellstarChef.Core.Tests
         }
 
         [Test]
-        public void SpicyPowerSalad_IsDiscovered_WithChili()
+        public async Task SpicyPowerSalad_IsDiscovered_WithChili()
         {
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\ingredients.csv").ToList();
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\dishrules.csv").ToList();
+            var ingredientRepo = new CsvIngredientRepository(@"d:\Rajiya\HellStarChef\data\ingredients.csv");
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
+            var ruleRepo = new CsvDishRuleRepository(@"d:\Rajiya\HellStarChef\data\dishrules.csv");
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
 
             PlayerChef chef = new PlayerChef();
             List<string> selection = new List<string> { "Chili", "Ice", "Fish" }; // Chili has Spicy=1.5, Power=true; Ice has no flavors
@@ -72,10 +79,12 @@ namespace HellstarChef.Core.Tests
         }
 
         [Test]
-        public void NoDishDiscovered_WithRandomIngredients()
+        public async Task NoDishDiscovered_WithRandomIngredients()
         {
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\ingredients.csv").ToList();
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\dishrules.csv").ToList();
+            var ingredientRepo = new CsvIngredientRepository(@"d:\Rajiya\HellStarChef\data\ingredients.csv");
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
+            var ruleRepo = new CsvDishRuleRepository(@"d:\Rajiya\HellStarChef\data\dishrules.csv");
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
 
             PlayerChef chef = new PlayerChef();
             List<string> selection = new List<string> { "Ice", "Ice" }; // Ice has no flavors/tags, won't match any rule
@@ -88,10 +97,12 @@ namespace HellstarChef.Core.Tests
         }
 
         [Test]
-        public void MultipleDishesDiscovered_WithMatchingIngredients()
+        public async Task MultipleDishesDiscovered_WithMatchingIngredients()
         {
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\ingredients.csv").ToList();
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\dishrules.csv").ToList();
+            var ingredientRepo = new CsvIngredientRepository(@"d:\Rajiya\HellStarChef\data\ingredients.csv");
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
+            var ruleRepo = new CsvDishRuleRepository(@"d:\Rajiya\HellStarChef\data\dishrules.csv");
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
 
             PlayerChef chef = new PlayerChef();
             // Ingredients that could match multiple rules if rules overlap
@@ -106,10 +117,12 @@ namespace HellstarChef.Core.Tests
         }
 
         [Test]
-        public void InvalidIngredientName_DoesNotCrash()
+        public async Task InvalidIngredientName_DoesNotCrash()
         {
-            List<Ingredient> pool = CsvIngredientRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\ingredients.csv").ToList();
-            List<DishRule> rules = CsvDishRuleRepository.ReadFromFile(@"d:\Rajiya\HellStarChef\data\dishrules.csv").ToList();
+            var ingredientRepo = new CsvIngredientRepository(@"d:\Rajiya\HellStarChef\data\ingredients.csv");
+            List<Ingredient> pool = (await ingredientRepo.GetAllAsync()).ToList();
+            var ruleRepo = new CsvDishRuleRepository(@"d:\Rajiya\HellStarChef\data\dishrules.csv");
+            List<DishRule> rules = (await ruleRepo.GetAllAsync()).ToList();
 
             PlayerChef chef = new PlayerChef();
             List<string> selection = new List<string> { "NonExistentIngredient", "Fish" };

@@ -7,15 +7,23 @@ using HellsterChef.Core.Rules;
 
 namespace HellsterChef.Core.Data
 {
-    public static class CsvDishRuleRepository
+    public class CsvDishRuleRepository : IDishRuleRepository
     {
-        // Expected CSV: Name,Conditions
-        // Conditions format: "Flavor>=Value;Tag=true;Flavor<=Value"
-        public static IEnumerable<DishRule> ReadFromFile(string path)
-        {
-            if (!File.Exists(path)) yield break;
+        private readonly string _filePath;
 
-            foreach (string line in File.ReadLines(path))
+        public CsvDishRuleRepository(string filePath)
+        {
+            _filePath = filePath;
+        }
+
+        public async Task<IEnumerable<DishRule>> GetAllAsync()
+        {
+            if (!File.Exists(_filePath)) return Enumerable.Empty<DishRule>();
+            
+            var lines = await File.ReadAllLinesAsync(_filePath);
+            var rules = new List<DishRule>();
+            
+            foreach (string line in lines)
             {
                 if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#")) continue;
 
@@ -37,8 +45,10 @@ namespace HellsterChef.Core.Data
                     }
                 }
 
-                yield return rule;
+                rules.Add(rule);
             }
+            
+            return rules;
         }
 
         private static Condition? ParseCondition(string cond)
@@ -71,7 +81,7 @@ namespace HellsterChef.Core.Data
                     if (Enum.TryParse<SpecialTag>(kv[0], true, out SpecialTag t) && bool.TryParse(kv[1], out bool presence))
                         return new Condition { RequiresTag = t, RequiresTagPresence = presence };
                     else if (kv[0] == "Base")
-                        return new Condition { RequiredBaseName = kv[1] };
+                        return new Condition { RequiredBaseNames = kv[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() };
                 }
             }
             return null;
