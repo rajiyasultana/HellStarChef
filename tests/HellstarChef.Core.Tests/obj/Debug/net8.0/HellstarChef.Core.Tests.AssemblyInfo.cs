@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HellstarChef.Core.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a45bea0fedb92b662931b485d4a031c9743e8691")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e74a887b8092b06928d369eb0da703ef6f4df8d7")]
 [assembly: System.Reflection.AssemblyProductAttribute("HellstarChef.Core.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HellstarChef.Core.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

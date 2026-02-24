@@ -36,9 +36,33 @@ namespace HellsterChef.Core.Data
                 string effectStr = parts[2].Trim();
                 string desc = parts[3].Trim();
 
+                // Optional columns: ScoreModifier, HardFail
+                double scoreModifier = 0.0;
+                bool hardFail = false;
+                if (parts.Length >= 5)
+                {
+                    double.TryParse(parts[4].Trim(), out scoreModifier);
+                }
+                if (parts.Length >= 6)
+                {
+                    bool.TryParse(parts[5].Trim(), out hardFail);
+                }
+
                 if (Enum.TryParse<SynergyEffect>(effectStr, true, out SynergyEffect effect))
                 {
-                    synergies.Add(new IngredientSynergy(ing1, ing2, effect, desc));
+                    // Default behaviors when values not provided
+                    if (parts.Length < 5)
+                    {
+                        switch (effect)
+                        {
+                            case SynergyEffect.Bonus: scoreModifier = 0.5; break;
+                            case SynergyEffect.Penalty: scoreModifier = -0.5; break;
+                            case SynergyEffect.Incompatible: scoreModifier = -2.0; break;
+                            case SynergyEffect.Poison: scoreModifier = -10.0; hardFail = true; break;
+                        }
+                    }
+
+                    synergies.Add(new IngredientSynergy(ing1, ing2, effect, desc, scoreModifier, hardFail));
                 }
             }
 

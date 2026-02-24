@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HellsterChef.Core.Models;
+using HellsterChef.Core.Data;
 using HellsterChef.Core.Rules;
 
 namespace HellsterChef.Core.Services
@@ -13,10 +14,27 @@ namespace HellsterChef.Core.Services
         public List<string> Reasons { get; set; } = new List<string>();
         public DishQuality Quality { get; set; }
         public bool IsPoisoned { get; set; }
+        public double CompatibilityScore { get; set; }
+        public List<string> CompatibilityNotes { get; set; } = new List<string>();
     }
 
-    public sealed class DishEvaluator
+    public sealed class DishEvaluator : IDishEvaluator
     {
+        private readonly ICompatibilityRepository _compatRepo;
+        private readonly ISynergyRepository _synergyRepo;
+
+        public DishEvaluator() : this(
+            new CsvCompatibilityRepository(Path.Combine("d:\\Rajiya\\HellStarChef", "data", "compatibility.csv")),
+            new CsvSynergyRepository(Path.Combine("d:\\Rajiya\\HellStarChef", "data", "synergies.csv")))
+        {
+        }
+
+        public DishEvaluator(ICompatibilityRepository compatRepo, ISynergyRepository synergyRepo)
+        {
+            _compatRepo = compatRepo;
+            _synergyRepo = synergyRepo;
+        }
+
         public DishEvaluationResult Evaluate(Dish dish, DishRule rule)
         {
             DishEvaluationResult result = new DishEvaluationResult();
@@ -42,16 +60,43 @@ namespace HellsterChef.Core.Services
                 }
             }
             
-            // Check for poisonous or strongly incompatible ingredient synergies
-            var poisonReasons = CheckPoisonousSynergies(dish.Ingredients);
-            if (poisonReasons.Any())
+            // Compute data-driven compatibility against per-ingredient flavor preferences
+            var compatibilityResult = CheckCompatibility(dish.Ingredients, flavorTotals);
+            result.CompatibilityScore = compatibilityResult.Score;
+            result.CompatibilityNotes.AddRange(compatibilityResult.Notes);
+
+            // If compatibility is strongly negative, mark as incompatible
+            if (result.CompatibilityScore <= -1.0)
+            {
+                result.Matches = false;
+                result.Quality = DishQuality.Dumb;
+                result.Reasons.AddRange(result.CompatibilityNotes);
+                return result;
+            }
+
+            // Check for poisonous, incompatible, or other synergies
+            var synergyResult = CheckSynergies(dish.Ingredients);
+            if (synergyResult.PoisonIssues.Any())
             {
                 result.IsPoisoned = true;
                 result.Matches = false;
                 result.Quality = DishQuality.Dumb;
-                result.Reasons.AddRange(poisonReasons);
+                result.Reasons.AddRange(synergyResult.PoisonIssues);
                 return result;
             }
+
+            if (synergyResult.IncompatibleIssues.Any())
+            {
+                result.Matches = false;
+                result.Quality = DishQuality.Dumb;
+                result.Reasons.AddRange(synergyResult.IncompatibleIssues);
+                result.CompatibilityScore = Math.Min(result.CompatibilityScore, -2.0);
+                return result;
+            }
+
+            // Attach bonuses and penalties as compatibility notes
+            result.CompatibilityNotes.AddRange(synergyResult.BonusNotes);
+            result.CompatibilityNotes.AddRange(synergyResult.PenaltyIssues.Select(p => "Unfavorable pairing: " + p));
 
             bool allOk = true;
             int closeCount = 0;
@@ -92,15 +137,31 @@ namespace HellsterChef.Core.Services
                 }
                 else if (cond.RequiredBaseNames is not null && cond.RequiredBaseNames.Count > 0)
                 {
-                    bool has = cond.RequiredBaseNames.Any(name => dish.Ingredients.Any(i => i.Name == name));
-                    if (!has)
+                    if (cond.RequireAllBases)
                     {
-                        allOk = false;
-                        result.Reasons.Add($"Required base ingredient not found; options: {string.Join(", ", cond.RequiredBaseNames)}");
+                        bool hasAll = cond.RequiredBaseNames.All(name => dish.Ingredients.Any(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase)));
+                        if (!hasAll)
+                        {
+                            allOk = false;
+                            result.Reasons.Add($"Required base ingredients missing (need all): {string.Join(" + ", cond.RequiredBaseNames)}");
+                        }
+                        else
+                        {
+                            exactCount++; // Base is exact
+                        }
                     }
                     else
                     {
-                        exactCount++; // Base is exact
+                        bool hasAny = cond.RequiredBaseNames.Any(name => dish.Ingredients.Any(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase)));
+                        if (!hasAny)
+                        {
+                            allOk = false;
+                            result.Reasons.Add($"Required base ingredient not found; options: {string.Join(", ", cond.RequiredBaseNames)}");
+                        }
+                        else
+                        {
+                            exactCount++; // Base is exact
+                        }
                     }
                 }
             }
@@ -128,41 +189,95 @@ namespace HellsterChef.Core.Services
             return result;
         }
 
-        private List<string> CheckPoisonousSynergies(IEnumerable<Ingredient> ingredients)
+        private sealed class SynergyCheckResult
         {
-            var issues = new List<string>();
-            string path = Path.Combine("d:\\Rajiya\\HellStarChef", "data", "synergies.csv");
-            if (!File.Exists(path)) return issues;
+            public List<string> PoisonIssues { get; } = new List<string>();
+            public List<string> IncompatibleIssues { get; } = new List<string>();
+            public List<string> PenaltyIssues { get; } = new List<string>();
+            public List<string> BonusNotes { get; } = new List<string>();
+        }
 
-            var lines = File.ReadAllLines(path);
-            var ingNames = new HashSet<string>(ingredients.Select(i => i.Name));
+        private SynergyCheckResult CheckSynergies(IEnumerable<Ingredient> ingredients)
+        {
+            var result = new SynergyCheckResult();
+            var ingNames = new HashSet<string>(ingredients.Select(i => i.Name), StringComparer.OrdinalIgnoreCase);
 
-            foreach (var line in lines)
+            var synergies = _synergyRepo.GetAllAsync().GetAwaiter().GetResult();
+            foreach (var s in synergies)
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
-                if (line.TrimStart().StartsWith("#")) continue;
-                // Expect: Ingredient1,Ingredient2,Effect,Description
-                string[] parts = line.Split(',', StringSplitOptions.None);
-                if (parts.Length < 4) continue;
-                string a = parts[0].Trim();
-                string b = parts[1].Trim();
-                string effect = parts[2].Trim();
-                string desc = parts[3].Trim();
-
-                if (ingNames.Contains(a) && ingNames.Contains(b))
+                if (ingNames.Contains(s.Ingredient1) && ingNames.Contains(s.Ingredient2))
                 {
-                    if (effect.Equals("Poison", StringComparison.OrdinalIgnoreCase))
+                    switch (s.Effect)
                     {
-                        issues.Add($"Poisonous combination detected: {desc} ({a} + {b})");
-                    }
-                    else if (effect.Equals("Penalty", StringComparison.OrdinalIgnoreCase))
-                    {
-                        issues.Add($"Unfavorable pairing: {desc} ({a} + {b})");
+                        case SynergyEffect.Poison:
+                            result.PoisonIssues.Add($"Poisonous combination detected: {s.Description} ({s.Ingredient1} + {s.Ingredient2})");
+                            break;
+                        case SynergyEffect.Incompatible:
+                            result.IncompatibleIssues.Add($"Incompatible combination: {s.Description} ({s.Ingredient1} + {s.Ingredient2})");
+                            break;
+                        case SynergyEffect.Penalty:
+                            result.PenaltyIssues.Add($"{s.Description} ({s.Ingredient1} + {s.Ingredient2})");
+                            break;
+                        case SynergyEffect.Bonus:
+                            result.BonusNotes.Add($"Nice pairing: {s.Description} ({s.Ingredient1} + {s.Ingredient2})");
+                            break;
                     }
                 }
             }
 
-            return issues;
+            return result;
+        }
+
+        private (double Score, List<string> Notes) CheckCompatibility(IEnumerable<Ingredient> ingredients, Dictionary<Flavor, double> flavorTotals)
+        {
+            var notes = new List<string>();
+            var entries = _compatRepo.GetAllAsync().GetAwaiter().GetResult().ToList();
+            var compMap = entries.ToDictionary(e => e.Ingredient, StringComparer.OrdinalIgnoreCase);
+
+            // Evaluate per main ingredient (Protein/Vegetable/Grain) preferences
+            var bases = ingredients.Where(i => i.Type == IngredientType.Protein || i.Type == IngredientType.Vegetable || i.Type == IngredientType.Grain).ToList();
+            if (!bases.Any()) return (0.0, notes);
+
+            double totalScore = 0.0;
+            int checks = 0;
+
+            foreach (var b in bases)
+            {
+                if (!compMap.TryGetValue(b.Name, out var comp)) continue;
+                foreach (var kv in comp.FlavorRanges)
+                {
+                    checks++;
+                    Flavor f = kv.Key;
+                    var range = kv.Value;
+                    double min = range.Min;
+                    double max = range.Max;
+                    double tol = range.MaxTolerable;
+                    flavorTotals.TryGetValue(f, out double val);
+
+                    if (val >= min && val <= max)
+                    {
+                        totalScore += 1.0;
+                    }
+                    else if (val > max && val <= tol)
+                    {
+                        totalScore -= 0.5;
+                        notes.Add($"{b.Name} tolerates some {f}, but level {val} is higher than preferred {max}");
+                    }
+                    else if (val > tol)
+                    {
+                        totalScore -= 2.0;
+                        notes.Add($"{b.Name} strongly dislikes excessive {f} (level {val})");
+                    }
+                    else if (val < min)
+                    {
+                        totalScore -= 0.5;
+                        notes.Add($"{b.Name} prefers more {f} (needs >={min}, got {val})");
+                    }
+                }
+            }
+
+            double score = checks > 0 ? totalScore / checks : 0.0; // normalized
+            return (score, notes);
         }
 
         // Discover which dishes match the mixed ingredients

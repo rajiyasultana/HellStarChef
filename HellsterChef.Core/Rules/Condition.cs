@@ -21,8 +21,11 @@ namespace HellsterChef.Core.Rules
         public SpecialTag? RequiresTag { get; init; }
         public bool RequiresTagPresence { get; init; }
 
-        // Base ingredient check (can be multiple options)
+        // Base ingredient check (can be multiple options).
+        // If `RequireAllBases` is true then all names in `RequiredBaseNames` must be present (AND).
+        // Otherwise any one of them is sufficient (OR).
         public List<string>? RequiredBaseNames { get; init; }
+        public bool RequireAllBases { get; init; }
 
         public bool Evaluate(double aggregatedFlavorValue)
         {

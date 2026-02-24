@@ -1,7 +1,26 @@
 Ingredient1,Ingredient2,Effect,Description
+# Poisonous combinations
 FirePaper,Mushroom,Poison,Combustible and fungal toxins react badly
 Honey,FirePaper,Poison,Caramelized paper releases toxins when heated
-Chili,Ice,Penalty,Texture clash reduces palatability
-Herb,Honey,Bonus,Enhances sweetness
-Mushroom,Tomato,Bonus,Classic combination
-Garlic,Ice,Poison,Raw cooling + raw garlic makes a bitter toxic taste
+Garlic,Ice,Poison,Raw cooling + raw garlic produces bitter/off flavors (toxic in-game)
+
+# Strong bonuses (classical pairings)
+Garlic,Butter,Bonus,Classic savory fat + aromatics
+Cheese,Pasta,Bonus,Cheesy pasta synergy
+Tomato,Mushroom,Bonus,Umami and acidity balance
+Honey,Herb,Bonus,Herb brightens sweet honey
+Chili,Garlic,Bonus,Spicy aromatics enhance heat complexity
+Butter,Beef,Bonus,Butter enriches beef
+
+# Penalties (unpleasant combos)
+Chili,Ice,Penalty,Chili's heat is numbed or texturally odd with ice
+Ice,Garlic,Penalty,Raw cold with raw garlic tastes harsh
+Herb,FirePaper,Penalty,Delicate herb is overwhelmed by combusted spice
+Honey,Chili,Penalty,Overpowering sweet-spicy clash when unbalanced
+
+# Acceptable neutral combos (no effect entries optional)
+Tomato,Cheese,Bonus,Tomato and cheese balance acidity and fat (pleasant)
+Rice,Butter,Bonus,Buttery rice is comforting and mild
+Milk,Lemon,Incompatible,Acid curdles milk and ruins texture
+Fish,Milk,Incompatible,Fishy proteins and milk often clash and curdle
+Chocolate,Garlic,Incompatible,Strongly unpleasant flavor clash that can ruin a dish

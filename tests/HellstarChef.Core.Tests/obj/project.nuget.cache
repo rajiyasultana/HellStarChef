@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "dUc7ZrMGDKo=",
+  "dgSpecHash": "FV4dRjlqDVU=",
   "success": true,
-  "projectFilePath": "D:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
+  "projectFilePath": "d:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rakib\\.nuget\\packages\\microsoft.codecoverage\\17.6.0\\microsoft.codecoverage.17.6.0.nupkg.sha512",
     "C:\\Users\\rakib\\.nuget\\packages\\microsoft.net.test.sdk\\17.6.0\\microsoft.net.test.sdk.17.6.0.nupkg.sha512",
