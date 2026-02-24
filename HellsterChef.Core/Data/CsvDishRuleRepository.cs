@@ -62,12 +62,17 @@ namespace HellsterChef.Core.Data
                 if (kv.Length == 2 && Enum.TryParse<Flavor>(kv[0], true, out Flavor f) && double.TryParse(kv[1], out double v))
                     return new Condition { Flavor = f, Comparison = Comparison.Equal, Value = v };
             }
-            else if (cond.Contains("=") && !cond.Contains(">=") && !cond.Contains("<="))
+            else if (cond.Contains("=") && !cond.Contains(">=") && !cond.Contains("<=") && !cond.Contains("=="))
             {
-                // Tag presence: "Memory=true"
+                // Tag presence: "Memory=true" or "Base=Beef"
                 string[] kv = cond.Split('=', StringSplitOptions.TrimEntries);
-                if (kv.Length == 2 && Enum.TryParse<SpecialTag>(kv[0], true, out SpecialTag t) && bool.TryParse(kv[1], out bool presence))
-                    return new Condition { RequiresTag = t, RequiresTagPresence = presence };
+                if (kv.Length == 2)
+                {
+                    if (Enum.TryParse<SpecialTag>(kv[0], true, out SpecialTag t) && bool.TryParse(kv[1], out bool presence))
+                        return new Condition { RequiresTag = t, RequiresTagPresence = presence };
+                    else if (kv[0] == "Base")
+                        return new Condition { RequiredBaseName = kv[1] };
+                }
             }
             return null;
         }

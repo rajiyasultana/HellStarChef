@@ -21,6 +21,9 @@ namespace HellsterChef.Core.Rules
         public SpecialTag? RequiresTag { get; init; }
         public bool RequiresTagPresence { get; init; }
 
+        // Base ingredient check
+        public string? RequiredBaseName { get; init; }
+
         public bool Evaluate(double aggregatedFlavorValue)
         {
             return Comparison switch

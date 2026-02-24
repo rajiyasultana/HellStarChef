@@ -8,7 +8,7 @@ namespace HellsterChef.Core.Data
 {
     public static class CsvIngredientRepository
     {
-        // Expected CSV columns: Name,Flavors,Rarity,Rawness,IsToxic,SpecialTags
+        // Expected CSV columns: Name,Flavors,Rarity,Rawness,IsToxic,SpecialTags,Type
         // Flavors format: "Savory:1;Umami:1;Spicy:0.5"
 
         public static IEnumerable<Ingredient> ReadFromFile(string path)
@@ -20,7 +20,7 @@ namespace HellsterChef.Core.Data
                 if (line.TrimStart().StartsWith("#")) continue;
 
                 string[] parts = line.Split(',', StringSplitOptions.None);
-                if (parts.Length < 6) continue;
+                if (parts.Length < 7) continue;
 
                 string name = parts[0].Trim();
                 string flavors = parts[1].Trim();
@@ -32,12 +32,15 @@ namespace HellsterChef.Core.Data
                 if (!double.TryParse(parts[3], out double rawness)) rawness = 0.0;
                 bool isToxic = bool.TryParse(parts[4], out bool tox) && tox;
                 string[] tags = parts[5].Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                string typeStr = parts[6].Trim();
+                IngredientType type = Enum.TryParse<IngredientType>(typeStr, true, out IngredientType it) ? it : IngredientType.Side;
 
                 Ingredient ingredient = new Ingredient(name)
                 {
                     Rarity = rarity,
                     Rawness = rawness,
-                    IsToxic = isToxic
+                    IsToxic = isToxic,
+                    Type = type
                 };
 
                 if (!string.IsNullOrWhiteSpace(flavors))

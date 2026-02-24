@@ -9,6 +9,7 @@ namespace HellsterChef.Core.Services
     {
         public bool Matches { get; set; }
         public List<string> Reasons { get; set; } = new List<string>();
+        public DishQuality Quality { get; set; }
     }
 
     public sealed class DishEvaluator
@@ -16,6 +17,16 @@ namespace HellsterChef.Core.Services
         public DishEvaluationResult Evaluate(Dish dish, DishRule rule)
         {
             DishEvaluationResult result = new DishEvaluationResult();
+
+            // Check for at least one base ingredient
+            bool hasBase = dish.Ingredients.Any(i => i.Type == IngredientType.Base);
+            if (!hasBase)
+            {
+                result.Reasons.Add("No base ingredient found; cannot form a proper dish.");
+                result.Matches = false;
+                result.Quality = DishQuality.Dumb;
+                return result;
+            }
 
             // aggregate flavor values from ingredients
             Dictionary<Flavor, double> flavorTotals = new Dictionary<Flavor, double>();
@@ -29,6 +40,8 @@ namespace HellsterChef.Core.Services
             }
 
             bool allOk = true;
+            int closeCount = 0;
+            int exactCount = 0;
             foreach (Condition cond in rule.Conditions)
             {
                 if (cond.Flavor is not null)
@@ -38,7 +51,16 @@ namespace HellsterChef.Core.Services
                     if (!ok)
                     {
                         allOk = false;
+                        double diff = cond.Comparison == Comparison.GreaterOrEqual ? cond.Value - total : total - cond.Value;
+                        if (Math.Abs(diff) <= 0.5) closeCount++;
                         result.Reasons.Add($"Flavor {cond.Flavor} check failed: got {total}, needed {cond.Comparison} {cond.Value}");
+                    }
+                    else
+                    {
+                        // Check if exact
+                        if (cond.Comparison == Comparison.GreaterOrEqual && total >= cond.Value && total <= cond.Value + 0.1) exactCount++;
+                        else if (cond.Comparison == Comparison.LessOrEqual && total <= cond.Value && total >= cond.Value - 0.1) exactCount++;
+                        else if (cond.Comparison == Comparison.Equal && Math.Abs(total - cond.Value) < 0.1) exactCount++;
                     }
                 }
                 else if (cond.RequiresTag is not null)
@@ -49,10 +71,46 @@ namespace HellsterChef.Core.Services
                         allOk = false;
                         result.Reasons.Add($"Tag {cond.RequiresTag} presence check failed: expected {cond.RequiresTagPresence}");
                     }
+                    else
+                    {
+                        exactCount++; // Tags are exact
+                    }
+                }
+                else if (cond.RequiredBaseName is not null)
+                {
+                    bool has = dish.Ingredients.Any(i => i.Name == cond.RequiredBaseName && i.Type == IngredientType.Base);
+                    if (!has)
+                    {
+                        allOk = false;
+                        result.Reasons.Add($"Required base ingredient {cond.RequiredBaseName} not found");
+                    }
+                    else
+                    {
+                        exactCount++; // Base is exact
+                    }
                 }
             }
 
             result.Matches = allOk && result.Reasons.Count == 0;
+
+            // Determine quality
+            bool hasToxic = dish.Ingredients.Any(i => i.IsToxic);
+            int baseCount = dish.Ingredients.Count(i => i.Type == IngredientType.Base);
+            if (!result.Matches)
+            {
+                if (closeCount > 0 && !hasToxic && baseCount == 1)
+                    result.Quality = DishQuality.Good;
+                else
+                    result.Quality = DishQuality.Dumb;
+            }
+            else
+            {
+                if (exactCount == rule.Conditions.Count && !hasToxic && baseCount == 1)
+                    result.Quality = DishQuality.Excellent;
+                else
+                    result.Quality = DishQuality.Good;
+            }
+
             return result;
         }
 

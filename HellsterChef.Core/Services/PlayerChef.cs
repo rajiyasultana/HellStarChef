@@ -22,7 +22,8 @@ namespace HellsterChef.Core.Services
                     {
                         Rarity = found.Rarity,
                         Rawness = found.Rawness,
-                        IsToxic = found.IsToxic
+                        IsToxic = found.IsToxic,
+                        Type = found.Type
                     };
                     foreach (KeyValuePair<Flavor, double> kv in found.FlavorProfile)
                     {

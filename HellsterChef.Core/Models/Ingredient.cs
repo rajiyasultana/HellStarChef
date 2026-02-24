@@ -10,6 +10,7 @@ namespace HellsterChef.Core.Models
         public double Rawness { get; init; }
         public bool IsToxic { get; init; }
         public HashSet<SpecialTag> SpecialTags { get; init; }
+        public IngredientType Type { get; init; }
 
         public Ingredient(string name)
         {
