@@ -926,11 +926,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "d:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
+      "projectUniqueName": "D:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
       "projectName": "HellstarChef.Core.Tests",
-      "projectPath": "d:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
+      "projectPath": "D:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\HellstarChef.Core.Tests.csproj",
       "packagesPath": "C:\\Users\\rakib\\.nuget\\packages\\",
-      "outputPath": "d:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\obj\\",
+      "outputPath": "D:\\Rajiya\\HellStarChef\\tests\\HellstarChef.Core.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -948,8 +948,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "d:\\Rajiya\\HellStarChef\\HellsterChef.Core\\HellsterChef.Core.csproj": {
-              "projectPath": "d:\\Rajiya\\HellStarChef\\HellsterChef.Core\\HellsterChef.Core.csproj"
+            "D:\\Rajiya\\HellStarChef\\HellsterChef.Core\\HellsterChef.Core.csproj": {
+              "projectPath": "D:\\Rajiya\\HellStarChef\\HellsterChef.Core\\HellsterChef.Core.csproj"
             }
           }
         }
