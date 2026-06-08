@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeSettings">
+    <configurations />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="c0e5c662-cf18-482c-85c1-330c876c19dc" name="Changes" comment="" />
+    <list default="true" id="c0e5c662-cf18-482c-85c1-330c876c19dc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/Dish.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/DishQuality.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/Flavor.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/Ingredient.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/IngredientCompatibility.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/IngredientSynergy.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/IngredientType.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HellsterChef.Core/Models/SpecialTag.cs" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,10 +32,10 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="3EiVVYZm34N0Xqo6RwcML7U3V2w" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -35,6 +53,11 @@
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -46,8 +69,12 @@
       <option name="presentableId" value="Default" />
       <updated>1780661401981</updated>
       <workItem from="1780661404945" duration="29000" />
+      <workItem from="1780900711423" duration="624000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
