@@ -1,0 +1,40 @@
+Ingredient,Flavor,PreferredMin,PreferredMax,MaxTolerable
+# Proteins
+Beef,Savory,1.0,3.0,4.0
+Beef,Umami,0.5,2.0,3.0
+Beef,Sweet,0.0,1.0,1.8
+Chicken,Savory,0.8,2.5,3.5
+Chicken,Umami,0.3,1.5,2.5
+Chicken,Sweet,0.0,0.8,1.2
+Fish,Umami,0.5,1.5,2.5
+Fish,Savory,0.5,1.5,2.5
+
+# Vegetables
+Mushroom,Umami,0.8,2.0,3.0
+Mushroom,Sweet,0.0,0.8,1.2
+Tomato,Sweet,0.5,1.2,1.8
+Tomato,Umami,0.2,1.0,1.8
+Onion,Sweet,0.2,0.8,1.2
+
+# Grains
+Rice,Umami,0.1,0.8,1.2
+Pasta,Umami,0.1,0.7,1.2
+
+# Dairy
+Cheese,Savory,0.3,1.2,2.0
+Cheese,Umami,0.3,1.5,2.5
+Butter,Savory,0.2,1.0,1.6
+
+# Spices & Seasonings (preferences express tolerances rather than base desires)
+Chili,Spicy,1.0,2.5,4.0
+Garlic,Savory,0.2,1.0,1.8
+Herb,Sweet,0.0,1.0,1.5
+Honey,Sweet,1.5,3.0,4.0
+FirePaper,Spicy,1.0,2.0,3.5
+
+# Liquids / Others
+Ice,Spicy,0.0,0.2,0.5
+
+# Fallback entries (safe defaults)
+Herb,Umami,0.0,0.5,1.0
+Garlic,Spicy,0.0,0.6,1.0
