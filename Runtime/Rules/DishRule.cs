@@ -5,8 +5,8 @@ namespace HellsterChef.Core.Rules
 {
     public sealed class DishRule
     {
-        public string Name { get; init; }
-        public List<Condition> Conditions { get; init; }
+        public string Name { get; set; }
+        public List<Condition> Conditions { get;   set; }
 
         public DishRule(string name)
         {

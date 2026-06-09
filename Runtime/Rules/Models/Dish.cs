@@ -4,8 +4,8 @@ namespace HellsterChef.Core.Models
 {
     public sealed class Dish
     {
-        public string Name { get; init; }
-        public List<Ingredient> Ingredients { get; init; }
+        public string Name { get; set; }
+        public List<Ingredient> Ingredients { get; set; }
 
         public Dish(string name)
         {

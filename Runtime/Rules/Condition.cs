@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HellsterChef.Core.Models;
 
 namespace HellsterChef.Core.Rules
@@ -12,20 +13,15 @@ namespace HellsterChef.Core.Rules
 
     public sealed class Condition
     {
-        // If Flavor is set, Value is compared against aggregated flavor value
-        public Flavor? Flavor { get; init; }
-        public Comparison Comparison { get; init; }
-        public double Value { get; init; }
+        public Flavor? Flavor { get; set; }
+        public Comparison Comparison { get; set; }
+        public double Value { get; set; }
 
-        // Tag checks
-        public SpecialTag? RequiresTag { get; init; }
-        public bool RequiresTagPresence { get; init; }
+        public SpecialTag? RequiresTag { get; set; }
+        public bool RequiresTagPresence { get; set; }
 
-        // Base ingredient check (can be multiple options).
-        // If `RequireAllBases` is true then all names in `RequiredBaseNames` must be present (AND).
-        // Otherwise any one of them is sufficient (OR).
-        public List<string>? RequiredBaseNames { get; init; }
-        public bool RequireAllBases { get; init; }
+        public List<string> RequiredBaseNames { get; set; }
+        public bool RequireAllBases { get; set; }
 
         public bool Evaluate(double aggregatedFlavorValue)
         {

@@ -4,13 +4,13 @@ namespace HellsterChef.Core.Models
 {
     public sealed class Ingredient
     {
-        public string Name { get; init; }
-        public Dictionary<Flavor, double> FlavorProfile { get; init; }
-        public int Rarity { get; init; }
-        public double Rawness { get; init; }
-        public bool IsToxic { get; init; }
-        public HashSet<SpecialTag> SpecialTags { get; init; }
-        public IngredientType Type { get; init; }
+        public string Name { get; set; }
+        public Dictionary<Flavor, double> FlavorProfile { get; set; }
+        public int Rarity { get; set; }
+        public double Rawness { get; set; }
+        public bool IsToxic { get; set; }
+        public HashSet<SpecialTag> SpecialTags { get; set; }
+        public IngredientType Type { get; set; }
 
         public Ingredient(string name)
         {

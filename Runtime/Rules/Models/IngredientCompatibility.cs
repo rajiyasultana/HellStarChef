@@ -4,8 +4,8 @@ namespace HellsterChef.Core.Models
 {
     public sealed class IngredientCompatibility
     {
-        public string Ingredient { get; init; }
-        public Dictionary<Flavor, (double Min, double Max, double MaxTolerable)> FlavorRanges { get; init; }
+        public string Ingredient { get; set; }
+        public Dictionary<Flavor, (double Min, double Max, double MaxTolerable)> FlavorRanges { get; set; }
 
         public IngredientCompatibility(string ingredient)
         {

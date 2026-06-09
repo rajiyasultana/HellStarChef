@@ -23,7 +23,8 @@ namespace HellsterChef.Core.Data
         {
             if (!File.Exists(_filePath)) return Enumerable.Empty<Ingredient>();
             
-            var lines = await File.ReadAllLinesAsync(_filePath);
+            // Replaced ReadAllLinesAsync with Task.Run for older .NET versions
+            var lines = await Task.Run(() => File.ReadAllLines(_filePath));
             var ingredients = new List<Ingredient>();
             
             foreach (string line in lines)
@@ -31,19 +32,27 @@ namespace HellsterChef.Core.Data
                 if (string.IsNullOrWhiteSpace(line)) continue;
                 if (line.TrimStart().StartsWith("#")) continue;
 
-                string[] parts = line.Split(',', StringSplitOptions.None);
+                string[] parts = line.Split(new[] { ',' }, StringSplitOptions.None);
                 if (parts.Length < 7) continue;
 
                 string name = parts[0].Trim();
                 string flavors = parts[1].Trim();
-                if (flavors.StartsWith("\"") && flavors.EndsWith("\""))
+                
+                // Replaced C# 8 range indexer flavors[1..^1] with Substring
+                if (flavors.StartsWith("\"") && flavors.EndsWith("\"") && flavors.Length >= 2)
                 {
-                    flavors = flavors[1..^1];
+                    flavors = flavors.Substring(1, flavors.Length - 2);
                 }
+                
                 if (!int.TryParse(parts[2], out int rarity)) rarity = 0;
                 if (!double.TryParse(parts[3], out double rawness)) rawness = 0.0;
                 bool isToxic = bool.TryParse(parts[4], out bool tox) && tox;
-                string[] tags = parts[5].Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                
+                // Removed TrimEntries, using LINQ instead
+                string[] tags = parts[5].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                        .Select(t => t.Trim())
+                                        .ToArray();
+                                        
                 string typeStr = parts[6].Trim();
                 IngredientType type = Enum.TryParse<IngredientType>(typeStr, true, out IngredientType it) ? it : IngredientType.Vegetable;
 
@@ -57,10 +66,17 @@ namespace HellsterChef.Core.Data
 
                 if (!string.IsNullOrWhiteSpace(flavors))
                 {
-                    string[] pairs = flavors.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    // Removed TrimEntries, using LINQ instead
+                    string[] pairs = flavors.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                            .Select(p => p.Trim())
+                                            .ToArray();
+                                            
                     foreach (string p in pairs)
                     {
-                        string[] kv = p.Split(':', StringSplitOptions.TrimEntries);
+                        string[] kv = p.Split(new[] { ':' }, StringSplitOptions.None)
+                                       .Select(k => k.Trim())
+                                       .ToArray();
+                                       
                         if (kv.Length != 2) continue;
                         if (Enum.TryParse<Flavor>(kv[0], true, out Flavor f) && double.TryParse(kv[1], out double v))
                         {
